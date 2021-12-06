@@ -1,14 +1,11 @@
-# 9.3 股票预测
-from keras.layers import Input, Dense, LSTM
-from keras.models import Model
-from keras.layers import Input, Dense
-from sklearn.preprocessing import MinMaxScaler
+#9.3 股票预测
 import pandas as pd
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
-%matplotlib inline
-data = pd.read_csv(‘data_stocks.csv’)
+# %matplotlib inline
+from sklearn.preprocessing import MinMaxScaler
+data = pd.read_csv('data_stocks.csv')
 data.describe()
 data.info()
 data.head()
@@ -42,20 +39,15 @@ tf.reset_default_graph()
 X = tf.placeholder(shape=[None, input_dim], dtype=tf.float32)
 Y = tf.placeholder(shape=[None], dtype=tf.float32)
 
-W1 = tf.get_variable('W1', [input_dim, hidden_1],
-                     initializer=tf.contrib.layers.xavier_initializer(seed=1))
+W1 = tf.get_variable('W1', [input_dim, hidden_1], initializer=tf.contrib.layers.xavier_initializer(seed=1))
 b1 = tf.get_variable('b1', [hidden_1], initializer=tf.zeros_initializer())
-W2 = tf.get_variable('W2', [hidden_1, hidden_2],
-                     initializer=tf.contrib.layers.xavier_initializer(seed=1))
+W2 = tf.get_variable('W2', [hidden_1, hidden_2], initializer=tf.contrib.layers.xavier_initializer(seed=1))
 b2 = tf.get_variable('b2', [hidden_2], initializer=tf.zeros_initializer())
-W3 = tf.get_variable('W3', [hidden_2, hidden_3],
-                     initializer=tf.contrib.layers.xavier_initializer(seed=1))
+W3 = tf.get_variable('W3', [hidden_2, hidden_3], initializer=tf.contrib.layers.xavier_initializer(seed=1))
 b3 = tf.get_variable('b3', [hidden_3], initializer=tf.zeros_initializer())
-W4 = tf.get_variable('W4', [hidden_3, hidden_4],
-                     initializer=tf.contrib.layers.xavier_initializer(seed=1))
+W4 = tf.get_variable('W4', [hidden_3, hidden_4], initializer=tf.contrib.layers.xavier_initializer(seed=1))
 b4 = tf.get_variable('b4', [hidden_4], initializer=tf.zeros_initializer())
-W5 = tf.get_variable('W5', [hidden_4, output_dim],
-                     initializer=tf.contrib.layers.xavier_initializer(seed=1))
+W5 = tf.get_variable('W5', [hidden_4, output_dim], initializer=tf.contrib.layers.xavier_initializer(seed=1))
 b5 = tf.get_variable('b5', [output_dim], initializer=tf.zeros_initializer())
 
 h1 = tf.nn.relu(tf.add(tf.matmul(X, W1), b1))
@@ -77,15 +69,13 @@ with tf.Session() as sess:
 
         for i in range(y_train.shape[0] // batch_size):
             start = i * batch_size
-            batch_x = X_train[start: start + batch_size]
-            batch_y = y_train[start: start + batch_size]
+            batch_x = X_train[start : start + batch_size]
+            batch_y = y_train[start : start + batch_size]
             sess.run(optimizer, feed_dict={X: batch_x, Y: batch_y})
 
             if i % 50 == 0:
-                print('MSE Train:', sess.run(
-                    cost, feed_dict={X: X_train, Y: y_train}))
-                print('MSE Test:', sess.run(
-                    cost, feed_dict={X: X_test, Y: y_test}))
+                print('MSE Train:', sess.run(cost, feed_dict={X: X_train, Y: y_train}))
+                print('MSE Test:', sess.run(cost, feed_dict={X: X_test, Y: y_test}))
                 y_pred = sess.run(out, feed_dict={X: X_test})
                 y_pred = np.squeeze(y_pred)
                 plt.plot(y_test, label='test')
@@ -93,6 +83,8 @@ with tf.Session() as sess:
                 plt.title('Epoch ' + str(e) + ', Batch ' + str(i))
                 plt.legend()
                 plt.show()
+from keras.layers import Input, Dense
+from keras.models import Model
 
 X_train = data_train[:, 1:]
 y_train = data_train[:, 0]
@@ -108,7 +100,7 @@ output_dim = 1
 batch_size = 256
 epochs = 10
 
-X = Input(shape=[input_dim, ])
+X = Input(shape=[input_dim,])
 h = Dense(hidden_1, activation='relu')(X)
 h = Dense(hidden_2, activation='relu')(h)
 h = Dense(hidden_3, activation='relu')(h)
@@ -117,8 +109,7 @@ Y = Dense(output_dim, activation='sigmoid')(h)
 
 model = Model(X, Y)
 model.compile(loss='mean_squared_error', optimizer='adam')
-model.fit(X_train, y_train, epochs=epochs,
-          batch_size=batch_size, shuffle=False)
+model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, shuffle=False)
 y_pred = model.predict(X_test)
 print('MSE Train:', model.evaluate(X_train, y_train, batch_size=batch_size))
 print('MSE Test:', model.evaluate(X_test, y_test, batch_size=batch_size))
@@ -126,6 +117,8 @@ plt.plot(y_test, label='test')
 plt.plot(y_pred, label='pred')
 plt.legend()
 plt.show()
+from keras.layers import Input, Dense, LSTM
+from keras.models import Model
 
 output_dim = 1
 batch_size = 256
@@ -133,25 +126,20 @@ epochs = 10
 seq_len = 5
 hidden_size = 128
 
-X_train = np.array([data_train[i: i + seq_len, 0]
-                    for i in range(data_train.shape[0] - seq_len)])[:, :, np.newaxis]
-y_train = np.array([data_train[i + seq_len, 0]
-                    for i in range(data_train.shape[0] - seq_len)])
-X_test = np.array([data_test[i: i + seq_len, 0]
-                   for i in range(data_test.shape[0] - seq_len)])[:, :, np.newaxis]
-y_test = np.array([data_test[i + seq_len, 0]
-                   for i in range(data_test.shape[0] - seq_len)])
+X_train = np.array([data_train[i : i + seq_len, 0] for i in range(data_train.shape[0] - seq_len)])[:, :, np.newaxis]
+y_train = np.array([data_train[i + seq_len, 0] for i in range(data_train.shape[0] - seq_len)])
+X_test = np.array([data_test[i : i + seq_len, 0] for i in range(data_test.shape[0] - seq_len)])[:, :, np.newaxis]
+y_test = np.array([data_test[i + seq_len, 0] for i in range(data_test.shape[0] - seq_len)])
 
 print(X_train.shape, y_train.shape, X_test.shape, y_test.shape)
 
-X = Input(shape=[X_train.shape[1], X_train.shape[2], ])
+X = Input(shape=[X_train.shape[1], X_train.shape[2],])
 h = LSTM(hidden_size, activation='relu')(X)
 Y = Dense(output_dim, activation='sigmoid')(h)
 
 model = Model(X, Y)
 model.compile(loss='mean_squared_error', optimizer='adam')
-model.fit(X_train, y_train, epochs=epochs,
-          batch_size=batch_size, shuffle=False)
+model.fit(X_train, y_train, epochs=epochs, batch_size=batch_size, shuffle=False)
 y_pred = model.predict(X_test)
 print('MSE Train:', model.evaluate(X_train, y_train, batch_size=batch_size))
 print('MSE Test:', model.evaluate(X_test, y_test, batch_size=batch_size))
@@ -159,3 +147,5 @@ plt.plot(y_test, label='test')
 plt.plot(y_pred, label='pred')
 plt.legend()
 plt.show()
+
+# https://cloud.tencent.com/developer/article/1032175
